@@ -2,158 +2,200 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>Homemade Passions by Bryce</title>
-
-  <meta
-    name="description"
-    content="Homemade Passions by Bryce — bakery, breakfast, coffee, and custom desserts in Riverton, Illinois."
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#24473f">
+  <title>Homemade Passions by Bryce | Riverton Bakery & Custom Cakes</title>
+  <meta name="description" content="A little homemade. A lot of heart. Visit Homemade Passions by Bryce in Riverton, Illinois for pastries and sweet treats, or inquire about custom cakes, cookies, and event catering.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Homemade Passions by Bryce">
+  <meta property="og:description" content="Handmade sweets, custom celebrations, and a little Riverton charm. Come find your something sweet.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.classList.add("js");</script>
+  <script src="script.js" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    "name": "Homemade Passions by Bryce",
+    "telephone": "+1-217-891-0332",
+    "email": "homemadepassionsbybryce@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "713 N 7th St",
+      "addressLocality": "Riverton",
+      "addressRegion": "IL",
+      "postalCode": "62561",
+      "addressCountry": "US"
+    },
+    "openingHoursSpecification": [{
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Thursday", "Friday", "Saturday", "Sunday"],
+      "opens": "07:00",
+      "closes": "12:00"
+    }],
+    "sameAs": [
+      "https://www.facebook.com/HOMEMADE.PASSIONS.BY.BRYCE",
+      "https://www.instagram.com/homemadepassionsbybryce/"
+    ]
+  }
+  </script>
 </head>
-
 <body>
-
-  <header>
-    <div class="container nav">
-      <a href="#" class="logo">Homemade Passions by Bryce</a>
-
-      <button class="menu-button" id="menuButton">
-        Menu
-      </button>
-
-      <nav id="mainNav">
-        <a href="#about">About</a>
-        <a href="#bakery">Bakery</a>
-        <a href="#custom">Custom Orders</a>
-        <a href="#visit">Visit</a>
-        <a href="#" class="button">Order Online</a>
+  <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="icon-northeast" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  </svg>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="announcement"><p>A sweet little stop in Riverton, Illinois</p><a href="#visit">Thursday–Sunday · 7am–noon <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg></a></div>
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a href="#home" class="wordmark" aria-label="Homemade Passions by Bryce, home"><img class="brand-logo" src="images/homemade-passions-script-logo-reconstructed.png" alt="Homemade Passions by Bryce" width="2076" height="758" decoding="async"></a>
+      <button class="menu-button" id="menuButton" type="button" aria-expanded="false" aria-controls="mainNav"><span data-menu-label>Menu</span><span class="menu-lines" aria-hidden="true"></span></button>
+      <nav id="mainNav" class="main-nav" aria-label="Main navigation">
+        <a href="#bakery">The bakery</a><a href="#custom">Custom creations</a><a href="#about">Our story</a><a href="#visit">Visit us</a>
+        <a class="button button-small" href="mailto:homemadepassionsbybryce@gmail.com?subject=Custom%20order%20inquiry">Let’s talk treats <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a>
       </nav>
     </div>
   </header>
+  <main id="main">
+    <section class="hero container" id="home" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-star" aria-hidden="true">✳</span> A bakery with a personal touch</p>
+        <h1 id="heroTitle">A little<br>homemade.<br><em>A lot of heart.</em></h1>
+        <p class="hero-description">Beautiful cakes, playful cookies, and pastries worth making a morning of. Made by Bryce, right here in Riverton.</p>
+        <div class="button-row"><a class="button" href="#bakery">Find your something sweet <svg class="icon" aria-hidden="true"><use href="#icon-arrow"></use></svg></a><a class="text-link" href="#custom">Make it a celebration <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div>
+        <a class="hero-location" href="#visit"><svg class="icon" aria-hidden="true"><use href="#icon-pin"></use></svg><span>713 N. 7th Street, Riverton, IL</span></a>
+      </div>
+      <div class="hero-art">
+        <figure class="hero-main-photo"><img src="images/sprinkle-cookie-stack.jpg" alt="A tall stack of sprinkle cookies with frosting dollops on a white plate." width="450" height="600" fetchpriority="high"><figcaption>A little stack of happiness.</figcaption></figure>
+        <figure class="hero-small-photo"><img src="images/glazed-red-fruit-pastries-on-white-platter.jpg" alt="Golden fruit-filled pastries drizzled with icing." width="450" height="600"><figcaption>Save room for sweet.</figcaption></figure>
+        <div class="bakery-stamp" aria-hidden="true"><span>Made with</span><svg viewBox="0 0 40 36"><path d="M20 32S3 22 3 11C3 1 16-2 20 8 24-2 37 1 37 11c0 11-17 21-17 21Z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>a little love</span></div>
+        <span class="hero-sparkle" aria-hidden="true"><svg class="sparkle" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 1v38M1 20h38M6.5 6.5l27 27M6.5 33.5l27-27" stroke="currentColor" stroke-width="1.5"/></svg></span>
+      </div>
+    </section>
+    <div class="treat-ribbon" aria-label="Cookies, cakes, pastries, and celebrations"><div class="container"><span>Cookies</span><span aria-hidden="true">✳</span><span>Cakes</span><span aria-hidden="true">✳</span><span>Pastries</span><span aria-hidden="true">✳</span><span>Everyday joys</span><span aria-hidden="true">✳</span><span>Big celebrations</span></div></div>
 
-
-  <main>
-
-    <section class="hero">
+    <section class="section bakery-section" id="bakery" aria-labelledby="bakeryTitle">
       <div class="container">
-        <p class="eyebrow">Riverton, Illinois</p>
-
-        <h1>Homemade Passions<br>by Bryce</h1>
-
-        <p>
-          Handmade baked goods, breakfast, coffee,
-          seasonal favorites, and custom desserts.
-        </p>
-
-        <div class="hero-buttons">
-          <a href="#" class="button">Order Online</a>
-          <a href="#visit" class="button secondary">Visit the Bakery</a>
+        <div class="section-heading"><div><p class="eyebrow">From the bakery</p><h2 id="bakeryTitle">The good stuff.</h2></div><p>Something for your morning. Something for the table.<br class="desktop-break"> Something you might not want to share.</p></div>
+        <div class="bakery-grid">
+          <article class="product-card">
+            <a class="product-photo" href="#visit" aria-label="Visit the bakery for pastries"><img src="images/glazed-blueberry-streusel-muffins.jpg" alt="Berry muffins with streusel topping and a drizzle of icing." width="450" height="600" loading="lazy" decoding="async"><span class="product-tag">Morning, made better</span></a>
+            <div class="product-title"><h3>Pastries & little comforts</h3><span aria-hidden="true">01</span></div><p>Golden edges, crumbly tops, and one more bite.</p>
+          </article>
+          <article class="product-card">
+            <a class="product-photo" href="#custom" aria-label="Explore custom cookies"><img src="images/assorted-cookies-on-black-platter.jpg" alt="A platter of assorted cookies with sprinkles, chocolate chips, and colorful toppings." width="450" height="600" loading="lazy" decoding="async"><span class="product-tag">Happiness by the handful</span></a>
+            <div class="product-title"><h3>Cookies, your way</h3><span aria-hidden="true">02</span></div><p>From a simple sweet treat to a very personal gift.</p>
+          </article>
+          <article class="product-card">
+            <a class="product-photo" href="#custom" aria-label="Explore cakes and sweet treats"><img src="images/mixed-berry-fruit-tart-on-green-background.jpg" alt="Fruit tart covered with strawberries, blueberries, raspberries, and blackberries." width="450" height="600" loading="lazy" decoding="async"><span class="product-tag">Bring a little color</span></a>
+            <div class="product-title"><h3>Cakes & sweet things</h3><span aria-hidden="true">03</span></div><p>A lovely finish to a meal. Or a reason to celebrate.</p>
+          </article>
+          <article class="product-card">
+            <a class="product-photo" href="mailto:homemadepassionsbybryce@gmail.com?subject=Bakery%20selection%20inquiry" aria-label="Email Bryce about pies and bakery selections"><img src="images/assorted-pies-and-quiche-display.jpg" alt="Assorted pies and a quiche arranged on stands inside the bakery." width="450" height="600" loading="lazy" decoding="async"><span class="product-tag">Made for the table</span></a>
+            <div class="product-title"><h3>A slice of homemade</h3><span aria-hidden="true">04</span></div><p>The kind of goodness that brings everyone around.</p>
+          </article>
         </div>
+        <div class="bakery-note"><span class="tiny-star" aria-hidden="true">✳</span><p>A taste of what we make. Selections change—<a href="https://www.facebook.com/HOMEMADE.PASSIONS.BY.BRYCE">see what’s baking on Facebook <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></p></div>
       </div>
     </section>
 
-
-    <section id="about">
+    <section class="section custom-section" id="custom" aria-labelledby="customTitle">
       <div class="container">
-        <p class="eyebrow">Our Story</p>
-
-        <h2>Made by Bryce.</h2>
-
-        <p>
-          Homemade Passions by Bryce is a local bakery focused on
-          handmade food, creative flavors, and bringing people together.
-        </p>
-      </div>
-    </section>
-
-
-    <section id="bakery" class="alternate">
-      <div class="container">
-        <p class="eyebrow">From the Bakery</p>
-
-        <h2>Something good is always baking.</h2>
-
-        <div class="cards">
-
-          <article class="card">
-            <h3>Baked Goods</h3>
-            <p>
-              Cookies, cakes, pastries, pies, and rotating seasonal favorites.
-            </p>
+        <div class="custom-intro"><div><p class="eyebrow">Your occasion. Our creative side.</p><h2 id="customTitle">Made for your kind<br> of <em>celebration.</em></h2></div><div class="custom-intro-copy"><p>A birthday with a little personality. A wedding with all the details. Or a just-because surprise. Let’s make something that feels like you.</p><a class="button" href="mailto:homemadepassionsbybryce@gmail.com?subject=Custom%20order%20inquiry&amp;body=Hi%20Bryce!%0A%0AI%27m%20planning%20a%20celebration.%0AOccasion%3A%20%0ADate%3A%20%0ANumber%20of%20guests%3A%20%0AWhat%20I%20have%20in%20mind%3A%20%0A%0AThank%20you!">Request a custom order <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div></div>
+        <div class="gallery-toolbar"><p class="gallery-intro">A few things we’ve made with love</p><div class="gallery-filters" role="group" aria-label="Filter custom creations"><button type="button" data-filter="all" aria-pressed="true">All creations</button><button type="button" data-filter="cakes" aria-pressed="false">Cakes</button><button type="button" data-filter="cookies" aria-pressed="false">Cookies</button><button type="button" data-filter="cupcakes" aria-pressed="false">Cupcakes</button></div></div>
+        <p class="sr-only" id="galleryStatus" role="status" aria-live="polite">Showing all 8 creations.</p>
+        <div class="gallery-grid">
+          <article class="gallery-card" data-gallery-item data-category="cakes">
+            <a class="gallery-image" href="images/blue-and-white-floral-cake-on-stand.jpg" data-gallery-open data-title="A little floral magic" aria-label="View celebration cake: A little floral magic">
+              <img src="images/blue-and-white-floral-cake-on-stand.jpg" alt="White cake with pale blue flowers, textured piping, and gold accents." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>A little floral magic</h3><p>Celebration cake</p></div>
           </article>
-
-          <article class="card">
-            <h3>Breakfast & Coffee</h3>
-            <p>
-              Stop by the Riverton bakery for breakfast and coffee.
-            </p>
+          <article class="gallery-card" data-gallery-item data-category="cookies">
+            <a class="gallery-image" href="images/black-white-gold-engagement-cookies.jpg" data-gallery-open data-title="A sweet “yes”" aria-label="View engagement cookies: A sweet “yes”">
+              <img src="images/black-white-gold-engagement-cookies.jpg" alt="Black, white, and gold engagement cookies with rings, bows, and celebratory lettering." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>A sweet “yes”</h3><p>Engagement cookies</p></div>
           </article>
-
-          <article class="card">
-            <h3>Seasonal Specials</h3>
-            <p>
-              Limited releases and special menus throughout the year.
-            </p>
+          <article class="gallery-card" data-gallery-item data-category="cupcakes">
+            <a class="gallery-image" href="images/pink-and-green-gnome-cupcakes-with-daisies.jpg" data-gallery-open data-title="Small cakes. Big personality." aria-label="View gnome cupcakes: Small cakes. Big personality.">
+              <img src="images/pink-and-green-gnome-cupcakes-with-daisies.jpg" alt="Gnome cupcakes with white beards, pink and green hats, and tiny daisies." width="600" height="450" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>Small cakes. Big personality.</h3><p>Gnome cupcakes</p></div>
           </article>
-
+          <article class="gallery-card" data-gallery-item data-category="cakes">
+            <a class="gallery-image" href="images/chocolate-drip-cake-mixed-berries.jpg" data-gallery-open data-title="Chocolate, meet berries" aria-label="View celebration cake: Chocolate, meet berries">
+              <img src="images/chocolate-drip-cake-mixed-berries.jpg" alt="Chocolate drip cake topped with strawberries, blueberries, raspberries, and blackberries." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>Chocolate, meet berries</h3><p>Celebration cake</p></div>
+          </article>
+          <article class="gallery-card" data-gallery-item data-category="cookies">
+            <a class="gallery-image" href="images/mermaid-seashell-and-starfish-decorated-cookies.jpg" data-gallery-open data-title="Under-the-sea sweetness" aria-label="View decorated cookies: Under-the-sea sweetness">
+              <img src="images/mermaid-seashell-and-starfish-decorated-cookies.jpg" alt="Turquoise, pink, and purple cookies decorated with mermaids, seashells, and starfish." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>Under-the-sea sweetness</h3><p>Decorated cookies</p></div>
+          </article>
+          <article class="gallery-card" data-gallery-item data-category="cakes">
+            <a class="gallery-image" href="images/black-and-ivory-vintage-piped-heart-cake.jpg" data-gallery-open data-title="All heart" aria-label="View vintage-style cake: All heart">
+              <img src="images/black-and-ivory-vintage-piped-heart-cake.jpg" alt="Ivory heart-shaped cake with ornate piped frosting and black borders." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>All heart</h3><p>Vintage-style cake</p></div>
+          </article>
+          <article class="gallery-card" data-gallery-item data-category="cupcakes">
+            <a class="gallery-image" href="images/chicken-frosted-cupcakes-on-tray.jpg" data-gallery-open data-title="Something to cluck about" aria-label="View chicken cupcakes: Something to cluck about">
+              <img src="images/chicken-frosted-cupcakes-on-tray.jpg" alt="White chicken cupcakes with orange beaks and red combs on a tray." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>Something to cluck about</h3><p>Chicken cupcakes</p></div>
+          </article>
+          <article class="gallery-card" data-gallery-item data-category="cupcakes">
+            <a class="gallery-image" href="images/assorted-cupcakes-with-berries-drizzle-and-candy.jpg" data-gallery-open data-title="A box of happy" aria-label="View cupcake assortment: A box of happy">
+              <img src="images/assorted-cupcakes-with-berries-drizzle-and-candy.jpg" alt="Box of cupcakes topped with berries, drizzle, and candy." width="450" height="600" loading="lazy" decoding="async">
+              <span class="image-expand" aria-hidden="true">+</span>
+            </a>
+            <div class="gallery-caption"><h3>A box of happy</h3><p>Cupcake assortment</p></div>
+          </article>
         </div>
+        <div class="custom-note"><span class="note-script">Let’s dream it up.</span><p>Tell Bryce your date, occasion, and what you have in mind.<br> We’ll talk through the details and availability together.</p><a class="text-link" href="tel:+12178910332">Or give us a call <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div>
       </div>
     </section>
 
-
-    <section id="custom">
-      <div class="container">
-        <p class="eyebrow">Custom Creations</p>
-
-        <h2>Made for your occasion.</h2>
-
-        <p>
-          Looking for cakes, cookies, desserts, or something special?
-          Get in touch with Bryce about a custom order.
-        </p>
-
-        <a href="#" class="button">Custom Orders</a>
+    <section class="gathering-section" aria-labelledby="gatheringTitle">
+      <div class="container gathering-layout">
+        <div class="gathering-photo"><img src="images/event-grazing-table-fruit-cheese-and-snacks.jpg" alt="A long grazing table filled with fruit, cheeses, vegetables, crackers, and snacks at a reception." width="450" height="600" loading="lazy" decoding="async"><span class="photo-corner" aria-hidden="true"></span></div>
+        <div class="gathering-copy"><p class="eyebrow">Beyond the cake</p><h2 id="gatheringTitle">A table worth<br><em>gathering around.</em></h2><p>Grazing tables, charcuterie boards, and small-event catering, with Bryce’s personal touch. A little abundance. A lot to enjoy together.</p><p class="gathering-small">Tell us who’s coming and what you’re celebrating.</p><a class="button button-light" href="mailto:homemadepassionsbybryce@gmail.com?subject=Event%20inquiry&amp;body=Hi%20Bryce!%0A%0AI%27d%20love%20to%20talk%20about%20food%20for%20an%20event.%0AEvent%20date%3A%20%0ALocation%3A%20%0ANumber%20of%20guests%3A%20%0AWhat%20I%20have%20in%20mind%3A%20%0A%0AThank%20you!">Talk about your event <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div>
+        <span class="gathering-sparkle" aria-hidden="true"><svg class="sparkle" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 1v38M1 20h38M6.5 6.5l27 27M6.5 33.5l27-27" stroke="currentColor" stroke-width="1.5"/></svg></span>
       </div>
     </section>
 
-
-    <section id="visit" class="alternate">
-      <div class="container">
-        <p class="eyebrow">Visit Us</p>
-
-        <h2>Homemade Passions by Bryce</h2>
-
-        <p>
-          713 N. 7th St.<br>
-          Riverton, IL 62561
-        </p>
-
-        <p>
-          Store hours and additional information coming soon.
-        </p>
+    <section class="section story-section" id="about" aria-labelledby="storyTitle">
+      <div class="container story-layout">
+        <div class="story-art"><figure><img src="images/bakery-counter-with-assorted-pastries.jpg" alt="The bakery counter displaying trays of iced pastries and assorted baked goods." width="450" height="600" loading="lazy" decoding="async"><figcaption>Our little corner of Riverton.</figcaption></figure><div class="story-logo"><img src="images/homemade-passions-script-logo-reconstructed.png" alt="Homemade Passions by Bryce logo with a pink piping bag." width="2076" height="758" loading="lazy" decoding="async"></div></div>
+        <div class="story-copy"><p class="eyebrow">The hands behind the homemade</p><h2 id="storyTitle">A familiar face.<br><em>A personal touch.</em></h2><p>Homemade Passions is the work of owner and pastry chef Bryce Cline. An Auburn native, Bryce built her bakery around custom orders and local markets before opening a Riverton storefront in 2024.</p><p>Today, that same personal approach is at the heart of the shop—from a treat for your morning to something made for your biggest moments.</p><a class="text-link" href="https://www.instagram.com/homemadepassionsbybryce/">Follow along with Bryce <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a><div class="story-signoff"><span>See you soon,</span><span>Bryce</span></div></div>
       </div>
     </section>
 
+    <section class="visit-section" id="visit" aria-labelledby="visitTitle">
+      <div class="container visit-layout">
+        <div class="visit-copy"><p class="eyebrow">Come find your something sweet</p><h2 id="visitTitle">See you at<br><em>the bakery.</em></h2><address><strong>Homemade Passions by Bryce</strong><span>713 N. 7th Street<br>Riverton, Illinois 62561</span></address><a class="button" href="https://www.google.com/maps/search/?api=1&amp;query=Homemade%20Passions%20by%20Bryce%20713%20N%207th%20St%20Riverton%20IL%2062561">Get directions <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a><div class="contact-links"><a href="tel:+12178910332">(217) 891-0332</a><a href="mailto:homemadepassionsbybryce@gmail.com">homemadepassionsbybryce@gmail.com</a></div></div>
+        <div class="hours-card"><div class="hours-card-inner"><span class="hours-sun" aria-hidden="true"><svg class="sparkle" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 1v38M1 20h38M6.5 6.5l27 27M6.5 33.5l27-27" stroke="currentColor" stroke-width="1.5"/></svg></span><h3>Good mornings<br>start here.</h3><dl class="hours-list"><div><dt>Thursday</dt><dd>7am–noon</dd></div><div><dt>Friday</dt><dd>7am–noon</dd></div><div><dt>Saturday</dt><dd>7am–noon</dd></div><div><dt>Sunday</dt><dd>7am–noon</dd></div><div class="closed-days"><dt>Monday–Wednesday</dt><dd>Closed</dd></div></dl><p>Holiday hours & the latest from the case</p><a class="text-link" href="https://www.facebook.com/HOMEMADE.PASSIONS.BY.BRYCE">Find us on Facebook <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div></div>
+      </div>
+    </section>
   </main>
 
-
-  <footer>
-    <div class="container footer">
-      <p>
-        © <span id="year"></span> Homemade Passions by Bryce
-      </p>
-
-      <p>
-        Riverton, Illinois
-      </p>
-    </div>
-  </footer>
-
-
-  <script src="script.js"></script>
-
+  <footer class="site-footer"><div class="container footer-top"><a href="#home" class="wordmark" aria-label="Homemade Passions by Bryce, back to top"><img class="brand-logo" src="images/homemade-passions-script-logo-reconstructed.png" alt="Homemade Passions by Bryce" width="2076" height="758" loading="lazy" decoding="async"></a><p>For everyday joys & the moments that matter.</p><div class="footer-socials"><a href="https://www.instagram.com/homemadepassionsbybryce/">Instagram <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a><a href="https://www.facebook.com/HOMEMADE.PASSIONS.BY.BRYCE">Facebook <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div></div><div class="container footer-bottom"><p>© <span id="year">2026</span> Homemade Passions by Bryce</p><p>Made with heart in Riverton, Illinois <span aria-hidden="true">♡</span></p></div></footer>
+  <dialog class="gallery-dialog" id="galleryDialog" aria-labelledby="dialogTitle"><div class="dialog-panel"><button class="dialog-close" id="dialogClose" type="button" aria-label="Close image">×</button><img id="dialogImage" alt=""><div class="dialog-caption"><h2 id="dialogTitle">Custom creation</h2><a class="text-link" href="mailto:homemadepassionsbybryce@gmail.com?subject=Custom%20order%20inquiry">Let’s make something for you <svg class="icon" aria-hidden="true"><use href="#icon-northeast"></use></svg></a></div></div></dialog>
 </body>
 </html>
