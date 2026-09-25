@@ -191,6 +191,111 @@ html:not(.js) .site-header { position: static; }
 .hours-card-inner > p { font-size: .66rem; color: var(--muted); }
 .hours-card .text-link { font-size: .74rem; }
 
+/* Wholesale partners */
+.wholesale-layout { display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 110px; max-width: 1060px; }
+.wholesale-copy h2 em { color: var(--rose); }
+.wholesale-copy > p:not(.eyebrow) { max-width: 460px; color: var(--muted); font-size: .9rem; margin-top: 24px; }
+.wholesale-copy > .wholesale-detail { font-size: .8rem !important; margin-top: 16px !important; }
+.wholesale-copy .button { margin-top: 28px; }
+.wholesale-photo { padding: 12px 12px 18px; background: var(--paper); border: 1px solid var(--line); transform: rotate(3deg); }
+.wholesale-photo img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; }
+.wholesale-photo figcaption { padding-top: 14px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 1.1rem; }
+
+/* A conversation with Bryce */
+.inquiry-section { background: #e9eddf; border-top: 1px solid var(--line); }
+.inquiry-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: 70px; align-items: start; }
+.inquiry-intro { position: sticky; top: 150px; }
+.inquiry-intro h2 { font-size: clamp(2.7rem, 4.1vw, 3.8rem); }
+.inquiry-intro h2 em { color: var(--rose); }
+.inquiry-intro > p:not(.eyebrow) { margin-top: 28px; max-width: 340px; font-size: .9rem; color: var(--muted); }
+.inquiry-expectations { max-width: 340px; margin-block: 30px 14px; padding-top: 25px; border-top: 1px solid #c8d0bf; }
+.inquiry-expectations h3 { font-size: 1.3rem; }
+.inquiry-expectations p { margin-top: 12px; font-size: .8rem; color: var(--muted); }
+.inquiry-intro .text-link { font-size: .78rem; }
+.inquiry-direct-email { display: block; width: fit-content; max-width: 100%; margin-top: 8px; font-size: .74rem; overflow-wrap: anywhere; }
+.inquiry-form-wrap { min-width: 0; padding: 36px; border: 1px solid #d0d7c8; border-radius: 8px; background: var(--paper); box-shadow: 0 10px 30px #24473f05; }
+.inquiry-form { display: none; }
+.js .inquiry-form { display: block; }
+.inquiry-form fieldset { min-width: 0; border: 0; padding: 0; margin: 0; }
+.inquiry-form legend { padding: 0; margin-bottom: 15px; font-size: .88rem; font-weight: 600; }
+.inquiry-form .sr-only { margin: -1px; }
+.form-mode-note { margin-bottom: 24px; font-size: .8rem; color: var(--muted); }
+.inquiry-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.inquiry-option { position: relative; display: flex; align-items: center; gap: 10px; min-height: 84px; padding: 15px 12px; background: var(--cream); border: 1px solid var(--line); border-radius: 5px; cursor: pointer; }
+.inquiry-option:has(input:checked) { border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); background: #e9eddf; }
+.inquiry-option input { width: 17px; height: 17px; flex: 0 0 auto; margin: 0; accent-color: var(--green); }
+.inquiry-option strong { display: block; font-family: var(--serif); font-size: 1.2rem; font-weight: 400; line-height: 1.2; }
+.inquiry-option small { display: block; margin-top: 5px; color: var(--muted); font-size: .67rem; }
+.form-required-note { margin-block: 24px 18px; font-size: .7rem; color: var(--muted); }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; }
+.form-field { min-width: 0; }
+.field-full { grid-column: 1 / -1; }
+.form-field label, .email-fallback > label { display: block; margin-bottom: 7px; font-size: .78rem; font-weight: 600; line-height: 1.5; }
+.form-field label span { font-weight: 400; color: var(--muted); font-size: .7rem; }
+.form-field input, .form-field select, .form-field textarea, .email-fallback textarea { display: block; width: 100%; min-width: 0; min-height: 48px; padding: 12px; border: 1px solid #b8c1b1; border-radius: 4px; color: var(--ink); background: #fffefb; font: inherit; font-size: 16px; line-height: 1.45; }
+.form-field textarea, .email-fallback textarea { resize: vertical; min-height: 130px; }
+.form-field input::placeholder, .form-field textarea::placeholder { color: #747b70; font-size: .78rem; opacity: 1; }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus, .email-fallback textarea:focus { outline: 2px solid var(--green); outline-offset: 2px; }
+.form-field [aria-invalid="true"] { border-color: #a13b3b; }
+.field-error { display: block; margin-top: 7px; color: #943737; font-size: .75rem; line-height: 1.45; }
+.field-hint { display: block; margin-top: 6px; color: var(--muted); font-size: .68rem; }
+.inquiry-form .inquiry-details { margin-top: 26px; padding-top: 26px; border-top: 1px solid var(--line); }
+.inquiry-details > legend { float: left; width: 100%; margin-bottom: 18px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
+.inquiry-details > .form-grid { clear: both; }
+.inquiry-message { margin-top: 24px; }
+.form-honeypot { display: none; }
+.inquiry-actions { display: flex; flex-direction: column; align-items: start; gap: 12px; margin-top: 24px; }
+.inquiry-actions .button { width: 100%; }
+.inquiry-actions p { font-size: .7rem; color: var(--muted); }
+.inquiry-fields:disabled .button { cursor: wait; opacity: .65; transform: none; }
+.form-error-summary, .form-status, .form-notice { padding: 16px; border: 1px solid #b9c5ac; border-radius: 4px; background: #edf2e5; font-size: .82rem; }
+.form-error-summary { margin-bottom: 24px; color: #7b3030; border-color: #d8a5a0; background: #fff0ec; }
+.form-error-summary ul { margin: 8px 0 0; padding-left: 20px; }
+.form-error-summary li + li { margin-top: 4px; }
+.form-status { margin-top: 22px; }
+.form-status[data-state="error"] { color: #7b3030; border-color: #d8a5a0; background: #fff0ec; }
+.email-fallback { margin-top: 18px; padding-top: 20px; border-top: 1px solid var(--line); }
+.email-fallback-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 20px; }
+.email-fallback .button { font-size: .76rem; padding-inline: 18px; }
+.copy-inquiry { border: 0; padding: 10px 0; background: transparent; color: var(--green); text-decoration: underline; text-underline-offset: 4px; font-size: .78rem; }
+.email-fallback > p { margin-block: 16px; font-size: .75rem; color: var(--muted); overflow-wrap: anywhere; }
+.email-fallback textarea { font-size: .78rem; }
+@media (max-width: 1100px) {
+  .wholesale-layout { gap: 60px; }
+  .inquiry-layout { grid-template-columns: .7fr 1.3fr; gap: 35px; }
+  .inquiry-form-wrap { padding: 26px; }
+  .inquiry-option strong { font-size: 1.1rem; }
+}
+@media (max-width: 800px) {
+  .wholesale-layout { gap: 40px; }
+  .wholesale-copy h2 { font-size: 2.7rem; }
+  .wholesale-photo figcaption { font-size: .9rem; }
+  .inquiry-layout { grid-template-columns: 1fr; gap: 32px; max-width: 640px; }
+  .inquiry-intro { position: static; }
+  .inquiry-intro h2 { font-size: 3rem; }
+  .inquiry-intro h2 br { display: none; }
+  .inquiry-intro > p:not(.eyebrow), .inquiry-expectations { max-width: none; }
+  .inquiry-expectations { margin-block: 22px 10px; padding-top: 18px; }
+}
+@media (max-width: 580px) {
+  .wholesale-layout { grid-template-columns: 1fr; gap: 36px; }
+  .wholesale-copy h2 { font-size: 2.8rem; }
+  .wholesale-copy > p:not(.eyebrow) { font-size: .85rem; }
+  .wholesale-photo { width: min(100% - 16px, 350px); margin-inline: auto; transform: rotate(2deg); }
+  .inquiry-form-wrap { padding: 22px 18px; }
+  .inquiry-intro h2 { font-size: 2.8rem; }
+  .inquiry-options { gap: 9px; }
+  .inquiry-option { min-height: 85px; padding: 12px 10px; gap: 8px; }
+  .inquiry-option strong { font-size: 1.1rem; }
+  .inquiry-option small { font-size: .62rem; }
+  .form-grid { grid-template-columns: 1fr; gap: 18px; }
+  .email-fallback-actions { align-items: stretch; flex-direction: column; gap: 7px; }
+}
+@media (max-width: 360px) {
+  .inquiry-form-wrap { padding-inline: 14px; }
+  .inquiry-option { flex-direction: column; align-items: start; gap: 9px; }
+}
+
 /* The sign on the way out */
 .site-footer { padding-top: 38px; }
 .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-bottom: 30px; }
