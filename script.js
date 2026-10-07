@@ -314,6 +314,147 @@ function initializeInquiryForm(form) {
   form.dataset.ready = "true";
 }
 
+// Optional motion enhances the page without hiding content or changing native scrolling.
+function initializePageMotion() {
+  const header = document.getElementById("siteHeader");
+  const main = document.getElementById("main");
+  if (!header || !main) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const desktopMotion = window.matchMedia("(min-width: 801px) and (hover: hover) and (pointer: fine)");
+  const navLinks = Array.from(header.querySelectorAll('nav a[href^="#"]'));
+  const sections = Array.from(main.children).filter((element) => element.tagName === "SECTION");
+  const heroArt = main.querySelector(".hero-art");
+  const photoLayers = Array.from(main.querySelectorAll("[data-scroll-shift]"));
+  const revealTargets = Array.from(main.querySelectorAll([
+    ".hero-description", ".hero-copy > .button-row", ".section-heading", ".product-card",
+    ".custom-intro", ".gallery-toolbar", ".gallery-card", ".custom-note",
+    ".wholesale-copy", ".wholesale-photo", ".gathering-photo", ".gathering-copy",
+    ".story-art", ".story-copy", ".visit-copy", ".hours-card"
+  ].join(",")));
+  const cardDelays = new Map();
+  [".product-card", ".gallery-card"].forEach((selector) => {
+    main.querySelectorAll(selector).forEach((card, index) => cardDelays.set(card, (index % 4) * 65));
+  });
+  const revealed = new Set();
+  const animations = new Map();
+  let revealObserver = null;
+  let frame = 0;
+  let currentLink = null;
+  let photosShifted = false;
+
+  const resetPhotos = () => {
+    if (!photosShifted) return;
+    photoLayers.forEach((photo) => photo.style.removeProperty("translate"));
+    photosShifted = false;
+  };
+  const cancelReveals = () => {
+    animations.forEach((animation) => animation.cancel());
+    animations.clear();
+  };
+  const updateScroll = () => {
+    frame = 0;
+    if (document.hidden) return;
+
+    // Batch geometry reads before style writes; there is no animation loop when idle.
+    const viewportHeight = window.innerHeight;
+    const headerHeight = header.getBoundingClientRect().height;
+    const marker = headerHeight + Math.max(0, (viewportHeight - headerHeight) * .22);
+    const positions = sections.map((section) => ({ section, bounds: section.getBoundingClientRect() }));
+    const current = positions.find(({ bounds }) => bounds.top <= marker && bounds.bottom > marker)?.section;
+    const nextLink = navLinks.find((link) => link.getAttribute("href") === `#${current?.id}`) || null;
+    const scrollRange = document.documentElement.scrollHeight - viewportHeight;
+    const progress = scrollRange > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollRange)) : 0;
+    const heroBounds = !reducedMotion.matches && desktopMotion.matches && heroArt
+      ? heroArt.getBoundingClientRect() : null;
+
+    header.classList.toggle("is-scrolled", window.scrollY > 16);
+    if (!reducedMotion.matches) header.style.setProperty("--scroll-progress", progress.toFixed(4));
+    if (nextLink !== currentLink) {
+      currentLink?.removeAttribute("aria-current");
+      nextLink?.setAttribute("aria-current", "location");
+      currentLink = nextLink;
+    }
+    if (heroBounds && heroBounds.bottom > headerHeight && heroBounds.top < viewportHeight) {
+      const phase = Math.max(-1, Math.min(1,
+        (viewportHeight / 2 - heroBounds.top - heroBounds.height / 2) / ((viewportHeight + heroBounds.height) / 2)));
+      photoLayers.forEach((photo) => {
+        // Individual translate preserves the original photograph and stamp rotations.
+        photo.style.translate = `0 ${(phase * Number(photo.dataset.scrollShift)).toFixed(2)}px`;
+      });
+      photosShifted = true;
+    } else resetPhotos();
+  };
+  const scheduleUpdate = () => {
+    if (!frame && !document.hidden) frame = window.requestAnimationFrame(updateScroll);
+  };
+  const configureMotion = () => {
+    revealObserver?.disconnect();
+    cancelReveals();
+    resetPhotos();
+    if (reducedMotion.matches) {
+      header.style.removeProperty("--scroll-progress");
+    } else if (typeof window.IntersectionObserver === "function") {
+      revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(({ target, isIntersecting, boundingClientRect }) => {
+          if (!isIntersecting && boundingClientRect.bottom >= 0) return;
+          revealObserver.unobserve(target);
+          revealed.add(target);
+          // Hash destinations and keyboard-focused content should be immediately steady.
+          if (!isIntersecting || reducedMotion.matches || document.hidden ||
+              target.contains(document.activeElement) || target.closest(":target") ||
+              typeof target.animate !== "function") return;
+          const animation = target.animate([
+            { opacity: .35, translate: `0 ${desktopMotion.matches ? 22 : 12}px` },
+            { opacity: 1, translate: "0 0" }
+          ], {
+            duration: desktopMotion.matches ? 620 : 440,
+            delay: desktopMotion.matches ? (cardDelays.get(target) || 0) : 0,
+            easing: "cubic-bezier(.2,.7,.2,1)",
+            fill: "backwards"
+          });
+          animations.set(target, animation);
+          const cleanup = () => {
+            if (animations.get(target) === animation) animations.delete(target);
+          };
+          animation.finished.then(cleanup, cleanup);
+        });
+      }, { threshold: .08, rootMargin: "0px 0px -24px 0px" });
+      revealTargets.forEach((target) => {
+        if (!revealed.has(target)) revealObserver.observe(target);
+      });
+    }
+    scheduleUpdate();
+  };
+
+  document.addEventListener("focusin", (event) => {
+    animations.forEach((animation, target) => {
+      if (target.contains(event.target)) {
+        animation.cancel();
+        animations.delete(target);
+      }
+    });
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+      cancelReveals();
+    } else scheduleUpdate();
+  });
+  window.addEventListener("scroll", scheduleUpdate, { passive: true });
+  window.addEventListener("resize", scheduleUpdate, { passive: true });
+  window.addEventListener("load", scheduleUpdate, { once: true });
+  [reducedMotion, desktopMotion].forEach((query) => {
+    if (typeof query.addEventListener === "function") query.addEventListener("change", configureMotion);
+    else query.addListener(configureMotion);
+  });
+  // Gallery filtering and late-loading content can change the page's scroll range.
+  if (typeof window.ResizeObserver === "function") new ResizeObserver(scheduleUpdate).observe(main);
+  header.dataset.motionReady = "true";
+  configureMotion();
+}
+
 (() => {
   "use strict";
 
@@ -329,7 +470,6 @@ function initializeInquiryForm(form) {
     const setMenuOpen = (open, restoreFocus = false) => {
       menuButton.setAttribute("aria-expanded", String(open));
       mainNav.classList.toggle("is-open", open);
-      document.body.classList.toggle("menu-open", open);
       if (menuLabel) menuLabel.textContent = open ? "Close" : "Menu";
       if (restoreFocus) menuButton.focus();
     };
@@ -384,13 +524,6 @@ function initializeInquiryForm(form) {
       mobileQuery.addListener(handleBreakpoint);
     }
     setMenuOpen(false);
-  }
-
-  const siteHeader = document.getElementById("siteHeader");
-  if (siteHeader) {
-    const updateHeader = () => siteHeader.classList.toggle("is-scrolled", window.scrollY > 16);
-    updateHeader();
-    window.addEventListener("scroll", updateHeader, { passive: true });
   }
 
   const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
@@ -471,4 +604,5 @@ function initializeInquiryForm(form) {
     });
   }
   initializeInquiryForm(document.getElementById("inquiryForm"));
+  initializePageMotion();
 })();
