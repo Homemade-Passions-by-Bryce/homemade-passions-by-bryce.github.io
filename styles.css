@@ -49,8 +49,6 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 .button-light { background: var(--cream); border-color: var(--cream); color: var(--green); }
 .button-light:not(:disabled):hover { background: var(--pink); border-color: var(--pink); }
 .button:disabled { cursor: not-allowed; }
-.button-shop { flex: 0 0 auto; flex-direction: column; gap: 4px; min-width: 145px; padding: 12px 20px; background: #eee9df; border-color: #c8c9bb; color: var(--muted); }
-.shop-status { font-size: .61rem; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; }
 .text-link { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; font-size: .85rem; font-weight: 500; text-decoration-thickness: 1px; }
 .text-link .icon { width: 18px; height: 18px; }
 
@@ -85,7 +83,7 @@ html:not(.js) .site-header { position: static; }
 .button-row .text-link { font-size: .78rem; }
 .hero-location { display: inline-flex; align-items: center; gap: 8px; margin-top: 30px; text-decoration: none; font-size: .7rem; color: var(--muted); }
 .hero-location .icon { width: 16px; height: 16px; }
-.hero-launch-note { margin-top: 12px; color: var(--muted); font-size: .69rem; }
+.hero-offer-note { margin-top: 12px; color: var(--muted); font-size: .69rem; }
 .hero-inquiry-link { max-width: 400px; margin-top: 25px; padding-top: 21px; border-top: 1px solid var(--line); color: var(--muted); font-size: .74rem; }
 .hero-inquiry-link a { color: var(--green); white-space: nowrap; }
 .hero-art { position: relative; height: 550px; }
@@ -153,6 +151,24 @@ html:not(.js) .site-header { position: static; }
 .custom-intro h2 em { color: var(--rose); }
 .custom-intro-copy { padding-bottom: 5px; }
 .custom-intro-copy p { max-width: 410px; margin-bottom: 22px; color: var(--muted); font-size: .9rem; }
+.cake-guide { margin-bottom: 48px; padding: 32px; border: 1px solid #cbd3c2; border-radius: 6px; background: var(--paper); }
+.cake-guide-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 28px; }
+.cake-guide-heading .eyebrow { margin-bottom: 10px; }
+.cake-guide-heading h3 { font-size: 2rem; letter-spacing: -.035em; }
+.cake-guide-heading .text-link { font-size: .74rem; }
+.cake-guide-tables { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 40px; }
+.cake-guide table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: .82rem; }
+.cake-guide caption { margin-bottom: 15px; font-family: var(--serif); font-size: 1.25rem; text-align: left; }
+.cake-guide th, .cake-guide td { padding: 12px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.cake-guide thead th { color: var(--muted); font-size: .68rem; font-weight: 500; line-height: 1.5; }
+.cake-guide th:first-child { width: 45%; padding-left: 0; }
+.cake-guide th:nth-child(2) { width: 30%; }
+.cake-guide tbody th { font-weight: 500; }
+.cake-guide th:last-child, .cake-guide td:last-child { padding-right: 0; text-align: right; }
+.cake-guide td:last-child { color: var(--rose); font-weight: 600; white-space: nowrap; }
+.cake-guide-footer { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-top: 25px; }
+.cake-guide-footer p { max-width: 620px; color: var(--muted); font-size: .76rem; }
+.cake-guide-footer .button { flex-shrink: 0; }
 .gallery-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 22px; border-bottom: 1px solid #ced4c6; margin-bottom: 28px; }
 .gallery-intro { font-size: .72rem; color: var(--muted); }
 .gallery-filters { display: none; flex-wrap: wrap; gap: 6px; }
@@ -371,6 +387,9 @@ html:not(.js) .site-header { position: static; }
   .main-nav > a { white-space: nowrap; }
 }
 @media (max-width: 800px) {
+  .cake-guide { padding: 26px; }
+  .cake-guide-tables { grid-template-columns: 1fr; gap: 28px; }
+  .cake-guide-footer { align-items: start; flex-direction: column; gap: 18px; }
   .shop-heading { gap: 25px; }
   .shop-heading h2 { font-size: 2.7rem; }
   .shop-intro { max-width: 340px; }
@@ -466,6 +485,11 @@ html:not(.js) .site-header { position: static; }
   .footer-socials { margin-left: auto; }
 }
 @media (max-width: 580px) {
+  .cake-guide { padding: 22px 18px; margin-bottom: 35px; }
+  .cake-guide-heading { flex-direction: column; align-items: start; gap: 10px; margin-bottom: 22px; }
+  .cake-guide-heading h3 { font-size: 1.8rem; }
+  .cake-guide table { font-size: .78rem; }
+  .cake-guide th, .cake-guide td { padding-inline: 5px; }
   .shop-intro { max-width: none; margin-top: 24px; }
   .shop-heading { margin-bottom: 34px; }
   .shop-intro > p:first-child { font-size: .9rem; }
