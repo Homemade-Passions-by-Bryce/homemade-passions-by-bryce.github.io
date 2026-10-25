@@ -1,40 +1,46 @@
-// Both inquiry types share one Formspree endpoint, configured on #inquiryForm.
-// If the endpoint is removed, the form falls back to preparing an email draft.
+// Both inquiry types share the endpoint on #inquiryForm. No customer photos are uploaded.
 function initializeInquiryForm(form) {
   if (!form) return;
   const doc = form.ownerDocument;
-  const fields = doc.getElementById("inquiryFields");
-  const submit = doc.getElementById("inquirySubmit");
-  const submitLabel = submit && submit.querySelector("[data-submit-label]");
-  const modeNote = doc.getElementById("inquiryModeNote");
-  const status = doc.getElementById("inquiryStatus");
-  const errorSummary = doc.getElementById("inquiryErrorSummary");
-  const errorList = doc.getElementById("inquiryErrors");
-  const fallback = doc.getElementById("inquiryEmailFallback");
-  const emailLink = doc.getElementById("inquiryEmailLink");
-  const emailText = doc.getElementById("inquiryEmailText");
-  const copyButton = doc.getElementById("inquiryCopy");
-  if (!fields || !submit || !submitLabel || !modeNote || !status || !errorSummary ||
-      !errorList || !fallback || !emailLink || !emailText || !copyButton) return;
+  const get = (id) => doc.getElementById(id);
+  const fields = get("inquiryFields");
+  const submit = get("inquirySubmit");
+  const submitLabel = submit?.querySelector("[data-submit-label]");
+  const modeNote = get("inquiryModeNote");
+  const status = get("inquiryStatus");
+  const errorSummary = get("inquiryErrorSummary");
+  const errorList = get("inquiryErrors");
+  const fallback = get("inquiryEmailFallback");
+  const emailLink = get("inquiryEmailLink");
+  const emailText = get("inquiryEmailText");
+  const copyButton = get("inquiryCopy");
+  const next = get("inquiryNext");
+  const back = get("inquiryBack");
+  const review = get("inquiryReview");
+  const quickReview = get("inquiryQuickReview");
+  const photoFollowup = get("inquiryPhotoFollowup");
+  const photoEmail = get("inquiryPhotoEmail");
+  if (![fields, submit, submitLabel, modeNote, status, errorSummary, errorList, fallback,
+    emailLink, emailText, copyButton, next, back, review, quickReview, photoFollowup, photoEmail].every(Boolean)) return;
 
   const recipient = "homemadepassionsbybryce@gmail.com";
   const radios = Array.from(form.querySelectorAll('input[name="request_type"]'));
   const panels = Array.from(form.querySelectorAll("[data-request-fields]"));
+  const products = Array.from(form.querySelectorAll("[data-product-fields]"));
+  const conditionals = Array.from(form.querySelectorAll("[data-when]"));
+  const steps = Array.from(form.querySelectorAll("[data-form-step]"));
+  const progress = Array.from(form.querySelectorAll("[data-step-go]"));
+  const disclosures = Array.from(form.querySelectorAll("details[data-responsive-details]"));
+  const compactView = window.matchMedia("(max-width: 800px)");
   const inputs = Array.from(fields.querySelectorAll("input[id], select[id], textarea[id]"))
     .filter((input) => !["radio", "hidden", "submit", "button"].includes(input.type) && input.name !== "_gotcha");
   const errors = new Map();
-  const names = {
-    name: "Your name", email: "Email address", phone: "Phone number", message: "Your message",
-    order_type: "Order type", event_date: "Preferred date", quantity: "Quantity or guest count",
-    budget: "Budget", inspiration: "Gallery inspiration", business_name: "Business name",
-    business_type: "Type of business", business_location: "Business location",
-    products: "Products of interest", estimated_volume: "Estimated volume", frequency: "Order frequency"
-  };
+  const stepNames = ["Your request", "The details", "Review & send"];
   let busy = false;
+  let currentStep = 0;
   let generalErrors = [];
 
   const configuredEndpoint = (form.dataset.formspreeEndpoint || "").trim();
-  // Do not accidentally send personal details to an example endpoint or another host.
   const endpointMatch = /^https:\/\/formspree\.io\/f\/([a-z0-9]+)$/i.exec(configuredEndpoint);
   const endpoint = endpointMatch && !/^(?:your.*|example.*|placeholder.*|formid|x{4,}|test)$/i.test(endpointMatch[1])
     ? configuredEndpoint : "";
@@ -44,14 +50,111 @@ function initializeInquiryForm(form) {
     ? "This is an inquiry. Bryce will confirm availability, pricing, and next steps with you."
     : "We’re taking inquiries by email. Fill this out to prepare a draft, then send it from your email app.";
 
+  const valueOf = (id) => get(id)?.value.trim() || "";
   const selectedType = () => radios.find((radio) => radio.checked)?.value === "wholesale" ? "wholesale" : "custom";
+  const labelOf = (input) => input.dataset.summaryLabel || input.name;
+  const stepOf = (input) => Number(input.closest("[data-form-step]")?.dataset.formStep || 0);
   const localToday = () => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   };
-  const eventDate = doc.getElementById("eventDate");
-  const updateMinimumDate = () => { if (eventDate) eventDate.min = localToday(); };
-
+  const updateMinimumDates = () => inputs.filter((input) => input.type === "date")
+    .forEach((input) => { input.min = localToday(); });
+  const requestSubject = () => `${selectedType() === "wholesale" ? "Wholesale" : "Custom order"} inquiry | Homemade Passions by Bryce`;
+  const answers = () => inputs.filter((input) => input.willValidate && input.value.trim()).map((input) => ({
+    label: labelOf(input),
+    value: input.tagName === "SELECT" ? input.selectedOptions[0].textContent.trim() : input.value.trim()
+  }));
+  // One set of fields on every device. Closing an optional section never disables it.
+  const adaptDisclosures = () => {
+    disclosures.forEach((details) => {
+      if (details.dataset.interacted === "true") return;
+      const focused = doc.activeElement;
+      if (focused && details.contains(focused) && focused.tagName !== "SUMMARY") return;
+      details.open = !compactView.matches;
+    });
+  };
+  const rememberDisclosure = (input) => {
+    let parent = input.parentElement;
+    while (parent && parent !== form) {
+      if (parent.matches("details[data-responsive-details]")) parent.dataset.interacted = "true";
+      parent = parent.parentElement;
+    }
+  };
+  const activeAnswer = (id) => {
+    const input = get(id);
+    if (!input?.willValidate || !input.value.trim()) return "";
+    return input.tagName === "SELECT" ? input.selectedOptions[0].textContent.trim() : input.value.trim();
+  };
+  const renderReview = () => {
+    review.replaceChildren();
+    quickReview.replaceChildren();
+    const add = (target, label, value) => {
+      if (!value) return;
+      const row = doc.createElement("div");
+      const term = doc.createElement("dt");
+      const detail = doc.createElement("dd");
+      term.textContent = label;
+      detail.textContent = value;
+      row.append(term, detail);
+      target.append(row);
+    };
+    add(review, "Request", selectedType() === "wholesale" ? "Wholesale" : "Custom order");
+    answers().forEach(({ label, value }) => add(review, label, value));
+    const brief = (value) => Array.from(value).length > 160 ? `${Array.from(value).slice(0, 160).join("")}…` : value;
+    const quick = (label, value) => add(quickReview, label, value);
+    if (selectedType() === "custom") {
+      quick("Request", activeAnswer("orderType"));
+      const date = activeAnswer("eventDate");
+      quick("When", date ? `${date}${valueOf("eventTiming") === "flexible" ? " (flexible)" : ""}` : activeAnswer("eventTiming"));
+      const quantity = activeAnswer("orderQuantity");
+      const unit = ["cake", "catering"].includes(valueOf("orderType")) ? "guests / servings"
+        : valueOf("orderType") === "pies" ? "pies" : "pieces";
+      quick("How many", quantity ? `${quantity} ${unit}` : activeAnswer("quantityPlan"));
+      quick("Your idea", brief(activeAnswer("designBrief") || activeAnswer("bakeDetails") || activeAnswer("cateringDetails")));
+      const inspirationCount = activeAnswer("inspirationLinks").split(/\r?\n/).filter((line) => line.trim()).length;
+      quick("Inspiration", [activeAnswer("inquiryInspiration"), inspirationCount
+        ? `${inspirationCount} photo ${inspirationCount === 1 ? "link" : "links"}` : ""].filter(Boolean).join(" · "));
+      quick("Budget", activeAnswer("orderBudget"));
+      quick("Fulfillment", activeAnswer("customFulfillment"));
+    } else {
+      quick("Business", [activeAnswer("businessName"), activeAnswer("businessLocation")].filter(Boolean).join("\n"));
+      quick("Products", brief(activeAnswer("wholesaleProducts")));
+      quick("Per order", activeAnswer("wholesaleVolume") || "Quantity to discuss with Bryce");
+      quick("Frequency", activeAnswer("wholesaleFrequency"));
+      quick("Fulfillment", activeAnswer("wholesaleFulfillment"));
+    }
+    // Always show the full dietary note, even when the rest of the review is compact.
+    quick("Dietary needs", activeAnswer("dietaryDetails") || activeAnswer("dietaryNeeds"));
+  };
+  const showStep = (index, focus = false) => {
+    currentStep = Math.max(0, Math.min(steps.length - 1, index));
+    // Hidden steps remain enabled: all relevant answers must be included in FormData.
+    steps.forEach((step) => { step.hidden = Number(step.dataset.formStep) !== currentStep; });
+    progress.forEach((button) => {
+      if (Number(button.dataset.stepGo) === currentStep) button.setAttribute("aria-current", "step");
+      else button.removeAttribute("aria-current");
+    });
+    back.hidden = currentStep === 0;
+    next.hidden = currentStep === steps.length - 1;
+    submit.hidden = !next.hidden;
+    get("inquiryStepStatus").textContent = `Step ${currentStep + 1} of ${steps.length}: ${stepNames[currentStep]}.`;
+    form.dataset.step = String(currentStep);
+    if (currentStep === 2) renderReview();
+    if (focus) get(`inquiryStepTitle${currentStep}`).focus();
+  };
+  const focusInput = (input) => {
+    showStep(stepOf(input));
+    let parent = input.parentElement;
+    while (parent && parent !== form) {
+      if (parent.tagName === "DETAILS") {
+        parent.open = true;
+        parent.dataset.interacted = "true";
+      }
+      parent = parent.parentElement;
+    }
+    input.focus();
+  };
   const showStatus = (message, state = "info", focus = false) => {
     status.textContent = message;
     status.dataset.state = state;
@@ -59,6 +162,9 @@ function initializeInquiryForm(form) {
     if (focus) status.focus();
   };
   const clearFeedback = () => {
+    fields.hidden = false;
+    modeNote.hidden = false;
+    get("inquiryStartAgain").hidden = true;
     status.hidden = true;
     status.textContent = "";
     delete status.dataset.state;
@@ -66,12 +172,15 @@ function initializeInquiryForm(form) {
     emailText.value = "";
     emailLink.href = `mailto:${recipient}`;
     copyButton.textContent = "Copy inquiry";
+    photoFollowup.hidden = true;
+    photoEmail.href = `mailto:${recipient}`;
+    get("inquiryPhotoMatch").textContent = "";
   };
   const renderErrors = () => {
     errorList.replaceChildren();
     inputs.forEach((input) => {
       const message = errors.get(input.id);
-      const inline = doc.getElementById(`${input.id}Error`);
+      const inline = get(`${input.id}Error`);
       if (message) input.setAttribute("aria-invalid", "true");
       else input.removeAttribute("aria-invalid");
       if (inline) {
@@ -85,7 +194,7 @@ function initializeInquiryForm(form) {
       link.textContent = message;
       link.addEventListener("click", (event) => {
         event.preventDefault();
-        input.focus();
+        focusInput(input);
       });
       item.append(link);
       errorList.append(item);
@@ -103,58 +212,77 @@ function initializeInquiryForm(form) {
     renderErrors();
   };
   const updatePanels = () => {
-    const type = selectedType();
-    panels.forEach((panel) => {
-      const inactive = panel.dataset.requestFields !== type;
-      panel.hidden = inactive;
-      panel.disabled = inactive;
-    });
+    const toggle = (panel, active) => { panel.hidden = !active; panel.disabled = !active; };
+    panels.forEach((panel) => toggle(panel, panel.dataset.requestFields === selectedType()));
+    products.forEach((panel) => toggle(panel, selectedType() === "custom" &&
+      panel.dataset.productFields.split(/\s+/).includes(valueOf("orderType"))));
+    conditionals.forEach((panel) => toggle(panel,
+      panel.dataset.values.split(/\s+/).includes(valueOf(panel.dataset.when))));
+    get("eventDate").required = valueOf("eventTiming") === "fixed";
+    get("eventDateLabel").textContent = get("eventDate").required ? "Date needed *" : "Preferred date (optional)";
+    const quantityLabel = ["cake", "catering"].includes(valueOf("orderType")) ? "Guests / servings needed"
+      : valueOf("orderType") === "pies" ? "Number of pies needed" : "Total pieces needed";
+    get("orderQuantityLabel").textContent = `${quantityLabel} *`;
+    get("orderQuantity").dataset.summaryLabel = quantityLabel;
+    get("inquiryStepTitle1").textContent = selectedType() === "wholesale" ? "A little about your needs" : "Tell Bryce your idea";
+    inputs.filter((input) => !input.willValidate).forEach((input) => errors.delete(input.id));
   };
   const validateInput = (input) => {
     if (!input.willValidate) return "";
     const value = input.value.trim();
-    const label = names[input.name] || "This field";
-    if (input.required && !value) return `${label} is required.`;
+    const label = labelOf(input);
+    if (input.required && !value) return `${label}: please choose an option or enter an answer.`;
     if (input.validity.badInput) return `${label}: enter a valid ${input.type === "number" ? "number" : "value"}.`;
     if (!value) return "";
     if (input.type === "email" && input.validity.typeMismatch) return "Enter a valid email address, such as name@example.com.";
     if (input.maxLength > -1 && value.length > input.maxLength) return `${label} must be ${input.maxLength} characters or fewer.`;
-    if (input.type === "date" && value < localToday()) return "Choose today or a future date, or leave the preferred date blank.";
+    if (input.type === "date" && value < localToday()) return input.required
+      ? `${label}: choose today or a future date. If unsure, change your timing choice to flexible or still planning.`
+      : `${label}: choose today or a future date, or leave this optional date blank.`;
     if (input.validity.rangeUnderflow || input.validity.rangeOverflow) return `${label} must be between ${input.min} and ${input.max}.`;
     if (input.validity.stepMismatch) return `${label}: enter a whole number.`;
+    if (input.id === "inspirationLinks") {
+      const links = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      if (links.length > 3) return "Please include no more than 3 inspiration links, one per line.";
+      const invalid = links.some((link) => {
+        try { const url = new URL(link); return !/^https?:\/\//i.test(link) || !["http:", "https:"].includes(url.protocol) || !url.hostname || Boolean(url.username || url.password); }
+        catch { return true; }
+      });
+      if (invalid) return "Use complete http:// or https:// inspiration links, one per line, without a username or password in the link.";
+    }
     if (!input.validity.valid) return `${label}: please check this value.`;
     return "";
   };
-  const validate = () => {
+  const validate = (predicate = () => true) => {
     clearErrors();
-    updateMinimumDate();
-    inputs.forEach((input) => {
-      // Trimming does not change punctuation, accents, or the meaning of a message.
+    updateMinimumDates();
+    inputs.filter(predicate).forEach((input) => {
       if (input.willValidate && input.type !== "number" && input.type !== "date") input.value = input.value.trim();
       const message = validateInput(input);
       if (message) errors.set(input.id, message);
     });
     renderErrors();
-    if (errors.size) inputs.find((input) => errors.has(input.id)).focus();
+    if (errors.size) focusInput(inputs.find((input) => errors.has(input.id)));
     return errors.size === 0;
   };
-  const requestSubject = () => selectedType() === "wholesale"
-    ? "Wholesale inquiry | Homemade Passions by Bryce"
-    : "Custom order inquiry | Homemade Passions by Bryce";
-  const createSummary = () => {
-    const lines = [requestSubject(), ""];
-    inputs.forEach((input) => {
-      if (!input.willValidate || !input.value.trim()) return;
-      const value = input.tagName === "SELECT" ? input.selectedOptions[0].textContent.trim() : input.value.trim();
-      lines.push(`${names[input.name] || input.name}: ${value}`);
-    });
-    lines.push("", "Please let me know about availability, pricing, and next steps.");
-    return lines.join("\n");
+  const navigate = (destination) => {
+    if (busy) return;
+    if (destination > currentStep && !validate((input) => stepOf(input) < destination)) return;
+    clearErrors();
+    showStep(destination, true);
   };
+  const createSummary = () => [requestSubject(), "", ...answers().map(({ label, value }) => `${label}: ${value}`),
+    "", "Please let me know about availability, pricing, and next steps."].join("\n");
   const showEmailFallback = (summary, subject) => {
     emailText.value = summary;
     emailLink.href = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
     fallback.hidden = false;
+  };
+  const showPhotoFollowup = (identity, subject) => {
+    const body = `Hi Bryce,\n\nI just submitted this inquiry on your website:\n${identity}\n\nI have attached inspiration photos for this request.\n\nThank you!`;
+    photoEmail.href = `mailto:${recipient}?subject=${encodeURIComponent(`Inspiration photos | ${subject}`)}&body=${encodeURIComponent(body)}`;
+    get("inquiryPhotoMatch").textContent = `Use this email draft to match your photos to the inquiry you just sent: ${identity.replace(/\n/g, " · ")}`;
+    photoFollowup.hidden = false;
   };
   const setBusy = (sending) => {
     busy = sending;
@@ -182,17 +310,47 @@ function initializeInquiryForm(form) {
     updatePanels();
     clearErrors();
     clearFeedback();
+    showStep(0);
   }));
-  form.addEventListener("input", (event) => {
+  const updateAnswer = (event) => {
     if (busy || !inputs.includes(event.target)) return;
+    rememberDisclosure(event.target);
     clearFeedback();
     generalErrors = [];
+    updatePanels();
     if (errors.has(event.target.id)) {
       const message = validateInput(event.target);
       if (message) errors.set(event.target.id, message);
       else errors.delete(event.target.id);
     }
     renderErrors();
+    if (currentStep === 2) renderReview();
+  };
+  form.addEventListener("input", updateAnswer);
+  form.addEventListener("change", updateAnswer);
+  disclosures.forEach((details) => {
+    const summary = details.querySelector(":scope > summary");
+    summary.addEventListener("click", () => { details.dataset.interacted = "true"; });
+    summary.addEventListener("keydown", (event) => {
+      if (["Enter", " "].includes(event.key)) details.dataset.interacted = "true";
+    });
+  });
+  if (typeof compactView.addEventListener === "function") compactView.addEventListener("change", adaptDisclosures);
+  else compactView.addListener(adaptDisclosures);
+  next.addEventListener("click", () => navigate(currentStep + 1));
+  back.addEventListener("click", () => navigate(currentStep - 1));
+  progress.forEach((button) => button.addEventListener("click", () => navigate(Number(button.dataset.stepGo))));
+  // Enter advances the current stage; textareas keep their normal multiline behavior.
+  form.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.isComposing && event.keyCode !== 229 && currentStep < 2 && event.target.tagName === "INPUT" && event.target.type !== "radio") {
+      event.preventDefault();
+      navigate(currentStep + 1);
+    }
+  });
+  get("inquiryStartAgain").addEventListener("click", () => {
+    clearFeedback();
+    clearErrors();
+    showStep(0, true);
   });
   copyButton.addEventListener("click", async () => {
     if (!emailText.value) return;
@@ -210,25 +368,29 @@ function initializeInquiryForm(form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (busy) return;
+    if (currentStep < 2) { navigate(currentStep + 1); return; }
     clearFeedback();
     if (!validate()) return;
     const honeypot = form.querySelector('[name="_gotcha"]');
-    if (honeypot && honeypot.value.trim()) {
+    if (honeypot?.value.trim()) {
       showStatus("We couldn’t prepare this inquiry. Please contact Bryce by email or phone.", "error", true);
       return;
     }
     const summary = createSummary();
     const subject = requestSubject();
+    const identity = [`Name: ${valueOf("contactName")}`, `Email: ${valueOf("contactEmail")}`,
+      selectedType() === "wholesale" ? `Business: ${valueOf("businessName")}`
+        : `Request: ${get("orderType").selectedOptions[0].textContent.trim()}${get("eventDate").willValidate && valueOf("eventDate") ? `; date: ${valueOf("eventDate")}` : "; date still being planned"}`].join("\n");
     if (!endpoint) {
       showEmailFallback(summary, subject);
-      showStatus("Your email draft is ready. Nothing has been sent yet—open it in your email app or copy the details below, then send it to Bryce.", "info", true);
+      showStatus("Your email draft is ready. Nothing has been sent yet. Open it in your email app or copy the details below, then send it to Bryce.", "info", true);
       return;
     }
-
-    // Capture the active fields before disabling them; disabled fields are omitted by FormData.
+    // Capture before disabling controls. Irrelevant branches are disabled and omitted.
     const payload = new FormData(form);
     payload.set("subject", subject);
     payload.set("request_type", selectedType());
+    payload.set("inquiry_summary", summary);
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
     setBusy(true);
@@ -239,18 +401,22 @@ function initializeInquiryForm(form) {
         signal: controller.signal, redirect: "error"
       });
       let result = null;
-      try { result = await response.json(); } catch { /* An unreadable response cannot confirm receipt. */ }
+      try { result = await response.json(); } catch { /* Unreadable responses cannot confirm receipt. */ }
       setBusy(false);
-      // Formspree's SDK recognizes { next: string }; older responses also use { ok: true }.
-      // Stay on this page and let explicit errors take priority over either success marker.
       const hasErrors = Boolean(result?.error) || (result?.errors != null &&
         (!Array.isArray(result.errors) || result.errors.length > 0));
-      const accepted = result?.ok !== false &&
-        (result?.ok === true || typeof result?.next === "string");
+      const accepted = result?.ok !== false && (result?.ok === true || typeof result?.next === "string");
       if (response.ok && accepted && !hasErrors) {
         form.reset();
+        disclosures.forEach((details) => { delete details.dataset.interacted; });
+        adaptDisclosures();
         updatePanels();
         clearErrors();
+        showStep(0);
+        fields.hidden = true;
+        modeNote.hidden = true;
+        get("inquiryStartAgain").hidden = false;
+        showPhotoFollowup(identity, subject);
         showStatus("Thank you—your inquiry has been submitted. Bryce will confirm availability, pricing, and next steps with you. Your order or wholesale account is not confirmed yet.", "success", true);
       } else {
         showEmailFallback(summary, subject);
@@ -259,10 +425,11 @@ function initializeInquiryForm(form) {
           ? "We’re receiving too many requests right now. Please wait a few minutes before trying again, or contact Bryce by email. Your details are still here."
           : response.ok
             ? "We couldn’t confirm that your inquiry was received. Please contact Bryce before sending it again to avoid a duplicate. Your details are still here."
-            : "Your inquiry couldn’t be submitted. Please check any details highlighted below, try again later, or contact Bryce by email. Your details are still here.";
+            : "Your inquiry couldn’t be submitted. Please check any highlighted details, try again later, or contact Bryce by email. Your details are still here.";
         showStatus(message, "error");
         const invalid = inputs.find((input) => errors.has(input.id));
-        (invalid || status).focus();
+        if (invalid) focusInput(invalid);
+        else status.focus();
       }
     } catch {
       setBusy(false);
@@ -281,40 +448,49 @@ function initializeInquiryForm(form) {
       const type = link.dataset.inquiryType;
       if (!["custom", "wholesale"].includes(type)) return;
       radios.forEach((radio) => { radio.checked = radio.value === type; });
+      const orderType = get("orderType");
+      if (type === "custom" && link.dataset.orderType &&
+          Array.from(orderType.options).some((option) => option.value === link.dataset.orderType)) orderType.value = link.dataset.orderType;
+      if (link.id === "dialogInquiry") {
+        get("inquiryInspiration").value = get("dialogTitle").textContent.trim();
+        get("customInspiration").open = true;
+        get("customInspiration").dataset.interacted = "true";
+        const dialog = get("galleryDialog");
+        if (dialog?.open) { dialog.dataset.inquiryNavigation = "true"; dialog.close(); }
+      }
       updatePanels();
       clearErrors();
       clearFeedback();
-      const orderType = doc.getElementById("orderType");
-      if (type === "custom" && orderType && link.dataset.orderType &&
-          Array.from(orderType.options).some((option) => option.value === link.dataset.orderType)) {
-        orderType.value = link.dataset.orderType;
-      }
-      if (link.id === "dialogInquiry") {
-        const inspiration = doc.getElementById("inquiryInspiration");
-        const title = doc.getElementById("dialogTitle");
-        if (inspiration && title) inspiration.value = title.textContent.trim();
-        const dialog = doc.getElementById("galleryDialog");
-        if (dialog && dialog.open) {
-          dialog.dataset.inquiryNavigation = "true";
-          dialog.close();
-        }
-      }
-      const section = doc.getElementById("inquire");
-      if (section) {
-        if (!section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
-        section.focus({ preventScroll: true });
-      }
+      showStep(0);
+      form.focus({ preventScroll: true });
     });
   });
 
-  updatePanels();
-  updateMinimumDate();
-  // Enable only after validation and submission handlers are installed.
   fields.disabled = false;
+  updatePanels();
+  updateMinimumDates();
+  showStep(0);
+  adaptDisclosures();
   form.dataset.ready = "true";
+  // With JavaScript ready, inquiry links land on the controls, including on phones.
+  // Without JavaScript, the original section anchor still reaches the email fallback.
+  doc.querySelectorAll('a[href="#inquire"]').forEach((link) => {
+    link.setAttribute("href", "#inquiryForm");
+    link.dataset.section = "inquire";
+    if (!link.dataset.inquiryType) link.addEventListener("click", (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      if (busy) { event.preventDefault(); return; }
+      // Start a fresh inquiry after confirmation; otherwise resume the current draft.
+      if (fields.hidden) {
+        clearFeedback();
+        clearErrors();
+        showStep(0);
+      }
+      form.focus({ preventScroll: true });
+    });
+  });
 }
 
-// Optional motion enhances the page without hiding content or changing native scrolling.
 function initializePageMotion() {
   const header = document.getElementById("siteHeader");
   const main = document.getElementById("main");
@@ -322,7 +498,9 @@ function initializePageMotion() {
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const desktopMotion = window.matchMedia("(min-width: 801px) and (hover: hover) and (pointer: fine)");
-  const navLinks = Array.from(header.querySelectorAll('nav a[href^="#"]'));
+  // The general inquiry link represents the section; mode shortcuts do not label it.
+  const navLinks = Array.from(header.querySelectorAll('nav a[href^="#"]'))
+    .filter((link) => !link.dataset?.inquiryType);
   const sections = Array.from(main.children).filter((element) => element.tagName === "SECTION");
   const heroArt = main.querySelector(".hero-art");
   const photoLayers = Array.from(main.querySelectorAll("[data-scroll-shift]"));
@@ -363,7 +541,8 @@ function initializePageMotion() {
     const marker = headerHeight + Math.max(0, (viewportHeight - headerHeight) * .22);
     const positions = sections.map((section) => ({ section, bounds: section.getBoundingClientRect() }));
     const current = positions.find(({ bounds }) => bounds.top <= marker && bounds.bottom > marker)?.section;
-    const nextLink = navLinks.find((link) => link.getAttribute("href") === `#${current?.id}`) || null;
+    const nextLink = navLinks.find((link) =>
+      (link.dataset?.section || link.getAttribute("href").slice(1)) === current?.id) || null;
     const scrollRange = document.documentElement.scrollHeight - viewportHeight;
     const progress = scrollRange > 0 ? Math.min(1, Math.max(0, window.scrollY / scrollRange)) : 0;
     const heroBounds = !reducedMotion.matches && desktopMotion.matches && heroArt
@@ -574,6 +753,9 @@ function initializePageMotion() {
         dialogImage.src = link.href;
         dialogImage.alt = thumbnail ? thumbnail.alt : (link.dataset.title || "Bakery photo");
         dialogTitle.textContent = link.dataset.title || dialogImage.alt;
+        const category = link.closest("[data-gallery-item]")?.dataset.category;
+        const inquiryLink = document.getElementById("dialogInquiry");
+        if (inquiryLink) inquiryLink.dataset.orderType = ({ cakes: "cake", cookies: "cookies", cupcakes: "cupcakes" })[category] || "other";
 
         try {
           galleryDialog.showModal();
@@ -599,7 +781,7 @@ function initializePageMotion() {
       dialogImage.alt = "";
       if (galleryDialog.dataset.inquiryNavigation === "true") {
         delete galleryDialog.dataset.inquiryNavigation;
-        document.getElementById("inquire")?.focus({ preventScroll: true });
+        document.getElementById("inquiryForm")?.focus({ preventScroll: true });
       } else if (opener && opener.isConnected && opener.getClientRects().length) opener.focus();
       opener = null;
     });

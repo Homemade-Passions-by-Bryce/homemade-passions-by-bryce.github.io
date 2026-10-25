@@ -93,7 +93,7 @@ html:not(.js) .site-header { position: static; }
 .hero-small-photo { position: absolute; left: -18px; bottom: -2px; width: 210px; padding: 9px 9px 13px; background: var(--paper); box-shadow: 0 12px 32px #19372f1a; transform: rotate(-8deg); }
 .hero-small-photo img { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: 50% 68%; }
 .hero-small-photo figcaption { padding-top: 10px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 16px; }
-.bakery-stamp { position: absolute; right: -24px; top: -15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 108px; height: 108px; border: 1px solid var(--rose); outline: 5px solid var(--pink); background: var(--pink); border-radius: 50%; color: var(--rose); transform: rotate(13deg); }
+.bakery-stamp { position: absolute; right: -24px; top: -15px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 108px; height: 108px; border: 1px solid var(--rose); outline: 5px solid var(--pink); background: var(--pink); border-radius: 50%; color: #914235; transform: rotate(13deg); }
 .bakery-stamp span { font-size: 9px; text-transform: uppercase; letter-spacing: .13em; line-height: 1; }
 .bakery-stamp svg { width: 29px; height: 25px; }
 .hero-sparkle { position: absolute; left: 28px; top: 54px; width: 48px; height: 48px; color: var(--rose); }
@@ -290,10 +290,7 @@ html:not(.js) .site-header { position: static; }
 .form-field [aria-invalid="true"] { border-color: #a13b3b; }
 .field-error { display: block; margin-top: 7px; color: #943737; font-size: .75rem; line-height: 1.45; }
 .field-hint { display: block; margin-top: 6px; color: var(--muted); font-size: .68rem; }
-.inquiry-form .inquiry-details { margin-top: 26px; padding-top: 26px; border-top: 1px solid var(--line); }
-.inquiry-details > legend { float: left; width: 100%; margin-bottom: 18px; font-family: var(--serif); font-size: 1.35rem; font-weight: 400; }
-.inquiry-details > .form-grid { clear: both; }
-.inquiry-message { margin-top: 24px; }
+.inquiry-form .inquiry-details { margin: 0; padding: 0; }
 .form-honeypot { display: none; }
 .inquiry-actions { display: flex; flex-direction: column; align-items: start; gap: 12px; margin-top: 24px; }
 .inquiry-actions .button { width: 100%; }
@@ -311,6 +308,63 @@ html:not(.js) .site-header { position: static; }
 .copy-inquiry { border: 0; padding: 10px 0; background: transparent; color: var(--green); text-decoration: underline; text-underline-offset: 4px; font-size: .78rem; }
 .email-fallback > p { margin-block: 16px; font-size: .75rem; color: var(--muted); overflow-wrap: anywhere; }
 .email-fallback textarea { font-size: .78rem; }
+/* A guided conversation: details appear only when they apply. */
+.inquiry-how { display: grid; gap: 12px; list-style: none; margin-top: 28px; padding: 0; font-size: .83rem; }
+.inquiry-how li { display: flex; align-items: center; gap: 12px; }
+.inquiry-how span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border: 1px solid #b9c5ac; border-radius: 50%; color: var(--green); font-size: .65rem; }
+.inquiry-intro > .text-link { display: flex; width: fit-content; margin-top: 12px; }
+.form-progress { margin-top: 25px; }
+.form-progress ol { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; list-style: none; padding: 0; margin: 0; }
+.form-progress li { min-width: 0; }
+.form-progress button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; height: 100%; min-height: 54px; padding: 10px 7px; border: 1px solid var(--line); border-radius: 4px; background: var(--cream); color: var(--green); font: inherit; font-size: .75rem; line-height: 1.4; cursor: pointer; }
+.form-progress button > span { font-size: .7rem; font-weight: 600; }
+.form-progress button[aria-current="step"] { background: var(--green); border-color: var(--green); color: var(--cream); }
+.form-progress button:hover:not([aria-current]) { background: #e9eddf; }
+.form-required-note { margin-block: 18px 25px; font-size: .78rem; line-height: 1.6; }
+.form-step > h3 { margin-bottom: 24px; font-size: 1.7rem; }
+.form-step > h3:focus { outline: none; }
+.form-field label { font-size: .83rem; }
+.form-field label span, .field-hint { font-size: .76rem; }
+.field-hint a { text-underline-offset: 3px; }
+.form-field input::placeholder, .form-field textarea::placeholder { font-size: .82rem; }
+.inquiry-form .product-details { margin-block: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
+.inquiry-details > .product-details:first-of-type { margin-top: 0; padding-top: 0; border: 0; }
+.product-details > legend { padding-right: 8px; font-family: var(--serif); font-size: 1.2rem; font-weight: 400; }
+.inquiry-form .conditional-fields { padding-left: 14px; border-left: 2px solid #c5cebb; }
+.inspiration-help { padding: 18px; border-radius: 5px; background: #eef0e6; font-size: .8rem; }
+.inspiration-help p { margin-top: 6px; color: var(--muted); }
+.inquiry-navigation { display: flex; align-items: center; gap: 18px; width: 100%; }
+.inquiry-navigation .button { flex: 1; }
+.form-back { min-height: 48px; border: 0; padding: 10px 6px; background: transparent; color: var(--green); text-decoration: underline; text-underline-offset: 4px; font: inherit; font-size: .85rem; cursor: pointer; }
+.inquiry-actions p { font-size: .76rem; }
+.inquiry-review { margin-top: 28px; padding: 18px; border: 1px solid #d0d7c8; border-radius: 5px; background: #f4f5ed; }
+.inquiry-review summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+.inquiry-review > p { margin-block: 12px 16px; color: var(--muted); font-size: .76rem; }
+.inquiry-review dl { margin: 0; font-size: .8rem; }
+.inquiry-review dl > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 14px; padding-block: 10px; border-top: 1px solid var(--line); }
+.inquiry-review dt { font-weight: 600; }
+.inquiry-review dd { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.photo-followup { margin-top: 18px; padding: 20px; border: 1px solid #b9c5ac; border-radius: 5px; background: #edf2e5; }
+.photo-followup h3 { font-size: 1.5rem; }
+.photo-followup p { margin-top: 12px; font-size: .8rem; overflow-wrap: anywhere; }
+.photo-followup .text-link { margin-top: 16px; font-size: .85rem; }
+.inquiry-form:focus { outline: none; }
+/* Optional preferences stay available without crowding the essential brief. */
+.form-extras { margin-top: 16px; border: 1px solid #cbd3c1; border-radius: 5px; background: #f4f5ed; }
+.form-extras > summary { min-height: 48px; padding: 15px 16px; color: var(--green); font-size: .85rem; font-weight: 600; line-height: 1.5; cursor: pointer; }
+.extras-caption { display: block; margin: 4px 0 0 17px; color: var(--muted); font-size: .75rem; font-weight: 400; }
+.extras-content { padding: 4px 16px 20px; }
+.inquiry-form .extras-content .product-details { margin-top: 20px; }
+.form-extras[open] > summary { margin-bottom: 10px; }
+.inquiry-form .request-brief { margin-top: 0; padding-top: 0; border: 0; }
+.request-brief textarea { min-height: 108px; }
+.inquiry-recap { display: none; margin-top: 24px; padding: 16px; border: 1px solid #cbd3c1; border-radius: 5px; background: #f4f5ed; }
+.inquiry-recap h4 { margin: 0 0 12px; font-size: .9rem; }
+.inquiry-recap dl { margin: 0; font-size: .8rem; }
+.inquiry-recap dl > div { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 12px; padding-block: 10px; border-top: 1px solid var(--line); }
+.inquiry-recap dt { font-weight: 600; }
+.inquiry-recap dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.inquiry-review > summary { min-height: 44px; align-content: center; }
 /* The sign on the way out */
 .site-footer { padding-top: 38px; }
 .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding-bottom: 30px; }
@@ -387,6 +441,9 @@ html:not(.js) .site-header { position: static; }
   .main-nav > a { white-space: nowrap; }
 }
 @media (max-width: 800px) {
+  .inquiry-recap { display: block; }
+  .inquiry-form .inquiry-review { margin-top: 12px; padding: 10px 16px; }
+  .inquiry-form .inspiration-help { margin-top: 18px; padding: 12px 14px; }
   .cake-guide { padding: 26px; }
   .cake-guide-tables { grid-template-columns: 1fr; gap: 28px; }
   .cake-guide-footer { align-items: start; flex-direction: column; gap: 18px; }
@@ -406,6 +463,7 @@ html:not(.js) .site-header { position: static; }
   .inquiry-intro { position: static; }
   .inquiry-intro h2 { font-size: 3rem; }
   .inquiry-intro h2 br { display: none; }
+  .inquiry-how { display: none; }
   .inquiry-intro > p:not(.eyebrow), .inquiry-expectations { max-width: none; }
   .inquiry-expectations { margin-block: 22px 10px; padding-top: 18px; }
   html { scroll-padding-top: 106px; }
@@ -504,6 +562,9 @@ html:not(.js) .site-header { position: static; }
   .wholesale-copy > p:where(:not(.eyebrow)) { font-size: .85rem; }
   .wholesale-photo { width: min(100% - 16px, 350px); margin-inline: auto; transform: rotate(2deg); }
   .inquiry-form-wrap { padding: 22px 18px; }
+  .form-progress button { flex-direction: column; gap: 3px; font-size: .73rem; }
+  .form-step > h3 { font-size: 1.5rem; }
+  .inquiry-review dl > div { grid-template-columns: 1fr; gap: 0; }
   .inquiry-intro h2 { font-size: 2.8rem; }
   .inquiry-options { gap: 9px; }
   .inquiry-option { min-height: 85px; padding: 12px 10px; gap: 8px; }
