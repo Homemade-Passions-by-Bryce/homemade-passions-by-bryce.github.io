@@ -330,7 +330,8 @@ function initializePageMotion() {
     ".hero-description", ".hero-copy > .button-row", ".section-heading", ".product-card",
     ".custom-intro", ".gallery-toolbar", ".gallery-card", ".custom-note",
     ".wholesale-copy", ".wholesale-photo", ".gathering-photo", ".gathering-copy",
-    ".story-art", ".story-copy", ".visit-copy", ".hours-card"
+    ".story-art", ".story-copy", ".visit-copy", ".hours-card",
+    ".mystery-copy", ".mystery-photo"
   ].join(",")));
   const cardDelays = new Map();
   [".product-card", ".gallery-card"].forEach((selector) => {
