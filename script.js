@@ -20,6 +20,12 @@ function initializeInquiryForm(form) {
   const quickReview = get("inquiryQuickReview");
   const photoFollowup = get("inquiryPhotoFollowup");
   const photoEmail = get("inquiryPhotoEmail");
+  const modePicker = get("inquiryKind");
+  const modeSummary = get("inquiryModeSummary");
+  const modeLabel = get("inquiryModeLabel");
+  const selectedInspiration = get("inquirySelectedInspiration");
+  const draftNotice = get("inquiryDraftNotice");
+  const draftActions = get("inquiryDraftActions");
   if (![fields, submit, submitLabel, modeNote, status, errorSummary, errorList, fallback,
     emailLink, emailText, copyButton, next, back, review, quickReview, photoFollowup, photoEmail].every(Boolean)) return;
 
@@ -34,11 +40,17 @@ function initializeInquiryForm(form) {
   const compactView = window.matchMedia("(max-width: 800px)");
   const inputs = Array.from(fields.querySelectorAll("input[id], select[id], textarea[id]"))
     .filter((input) => !["radio", "hidden", "submit", "button"].includes(input.type) && input.name !== "_gotcha");
+  const initialValues = new Map(inputs.map((input) => [input.id, input.value]));
+  const hasDraftAnswers = () => inputs.some((input) => input.value.trim() && input.value !== initialValues.get(input.id));
   const errors = new Map();
   const stepNames = ["Your request", "The details", "Review & send"];
   let busy = false;
   let currentStep = 0;
   let generalErrors = [];
+  let compactMode = false;
+  let storageAvailable = true;
+  let uncertainSubmission = false;
+  const draftKey = "homemade-passions:inquiry-draft:v1";
 
   const configuredEndpoint = (form.dataset.formspreeEndpoint || "").trim();
   const endpointMatch = /^https:\/\/formspree\.io\/f\/([a-z0-9]+)$/i.exec(configuredEndpoint);
@@ -52,6 +64,86 @@ function initializeInquiryForm(form) {
 
   const valueOf = (id) => get(id)?.value.trim() || "";
   const selectedType = () => radios.find((radio) => radio.checked)?.value === "wholesale" ? "wholesale" : "custom";
+  const renderContext = () => {
+    const compact = compactMode || currentStep > 0;
+    if (modePicker && modeSummary && modeLabel) {
+      modePicker.hidden = compact;
+      modeSummary.hidden = !compact;
+      modeLabel.textContent = selectedType() === "wholesale" ? "Wholesale inquiry" : "Custom order inquiry";
+    }
+    form.dataset.modeCompact = String(compact);
+    const inspiration = selectedType() === "custom" ? valueOf("inquiryInspiration") : "";
+    if (selectedInspiration) {
+      selectedInspiration.hidden = !inspiration;
+      get("inquirySelectedInspirationName").textContent = inspiration;
+    }
+  };
+  const showDraftNotice = (restored = false) => {
+    if (!draftNotice || !draftActions) return;
+    const hasAnswers = hasDraftAnswers();
+    draftNotice.hidden = !hasAnswers;
+    draftActions.hidden = !hasAnswers;
+    let message = storageAvailable
+      ? restored ? "Your saved inquiry draft has been restored in this tab." : "Your inquiry draft is saved in this tab."
+      : "Your browser cannot save this draft. Keep this tab open until you send your inquiry.";
+    if (uncertainSubmission && !busy) message += " A previous submission may have gone through. Please contact Bryce before sending again.";
+    // Do not repeat a live-region announcement on every keystroke.
+    if (draftNotice.textContent !== message) draftNotice.textContent = message;
+  };
+  const clearDraft = () => {
+    try { window.sessionStorage.removeItem(draftKey); } catch { storageAvailable = false; }
+    uncertainSubmission = false;
+    if (draftNotice) draftNotice.hidden = true;
+    if (draftActions) draftActions.hidden = true;
+  };
+  const saveDraft = () => {
+    if (!hasDraftAnswers()) { clearDraft(); return; }
+    if (storageAvailable) {
+      try {
+        window.sessionStorage.setItem(draftKey, JSON.stringify({
+          version: 1, type: selectedType(), step: currentStep, compact: compactMode,
+          uncertainSubmission, values: Object.fromEntries(inputs.map((input) => [input.id, input.value]))
+        }));
+      } catch {
+        storageAvailable = false;
+        // Avoid restoring a stale earlier snapshot if a later write is refused.
+        try { window.sessionStorage.removeItem(draftKey); } catch { /* Storage can be disabled. */ }
+      }
+    }
+    showDraftNotice();
+  };
+  const restoreDraft = () => {
+    let raw;
+    try { raw = window.sessionStorage.getItem(draftKey); }
+    catch { storageAvailable = false; return false; }
+    if (!raw) return false;
+    try {
+      if (raw.length > 100000) throw new Error("Draft is too large");
+      const saved = JSON.parse(raw);
+      if (saved?.version !== 1 || !["custom", "wholesale"].includes(saved.type) ||
+          !Number.isInteger(saved.step) || saved.step < 0 || saved.step >= steps.length ||
+          !saved.values || typeof saved.values !== "object" || Array.isArray(saved.values)) throw new Error("Invalid draft");
+      // Only known form controls can be restored; storage never supplies markup or actions.
+      inputs.forEach((input) => {
+        const value = saved.values[input.id];
+        if (typeof value !== "string" || value.length > (input.maxLength > -1 ? input.maxLength : 10000)) return;
+        if (input.tagName === "SELECT" && !Array.from(input.options).some((option) => option.value === value)) return;
+        input.value = value;
+      });
+      if (!hasDraftAnswers()) { clearDraft(); return false; }
+      radios.forEach((radio) => { radio.checked = radio.value === saved.type; });
+      currentStep = saved.step;
+      compactMode = saved.compact === true;
+      uncertainSubmission = saved.uncertainSubmission === true;
+      return true;
+    } catch { clearDraft(); return false; }
+  };
+  const focusVisible = (target) => {
+    target.focus({ preventScroll: true });
+    const headerHeight = get("siteHeader")?.getBoundingClientRect().height || 0;
+    window.scrollTo({ top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - headerHeight - 16),
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  };
   const labelOf = (input) => input.dataset.summaryLabel || input.name;
   const stepOf = (input) => Number(input.closest("[data-form-step]")?.dataset.formStep || 0);
   const localToday = () => {
@@ -140,8 +232,9 @@ function initializeInquiryForm(form) {
     submit.hidden = !next.hidden;
     get("inquiryStepStatus").textContent = `Step ${currentStep + 1} of ${steps.length}: ${stepNames[currentStep]}.`;
     form.dataset.step = String(currentStep);
+    renderContext();
     if (currentStep === 2) renderReview();
-    if (focus) get(`inquiryStepTitle${currentStep}`).focus();
+    if (focus) focusVisible(get(`inquiryStepTitle${currentStep}`));
   };
   const focusInput = (input) => {
     showStep(stepOf(input));
@@ -153,7 +246,7 @@ function initializeInquiryForm(form) {
       }
       parent = parent.parentElement;
     }
-    input.focus();
+    focusVisible(input);
   };
   const showStatus = (message, state = "info", focus = false) => {
     status.textContent = message;
@@ -226,6 +319,7 @@ function initializeInquiryForm(form) {
     get("orderQuantity").dataset.summaryLabel = quantityLabel;
     get("inquiryStepTitle1").textContent = selectedType() === "wholesale" ? "A little about your needs" : "Tell Bryce your idea";
     inputs.filter((input) => !input.willValidate).forEach((input) => errors.delete(input.id));
+    renderContext();
   };
   const validateInput = (input) => {
     if (!input.willValidate) return "";
@@ -270,6 +364,7 @@ function initializeInquiryForm(form) {
     if (destination > currentStep && !validate((input) => stepOf(input) < destination)) return;
     clearErrors();
     showStep(destination, true);
+    saveDraft();
   };
   const createSummary = () => [requestSubject(), "", ...answers().map(({ label, value }) => `${label}: ${value}`),
     "", "Please let me know about availability, pricing, and next steps."].join("\n");
@@ -287,6 +382,7 @@ function initializeInquiryForm(form) {
   const setBusy = (sending) => {
     busy = sending;
     fields.disabled = sending;
+    if (get("inquiryDiscardDraft")) get("inquiryDiscardDraft").disabled = sending;
     form.setAttribute("aria-busy", String(sending));
     submitLabel.textContent = sending ? "Sending…" : defaultLabel;
     if (!sending) updatePanels();
@@ -311,7 +407,40 @@ function initializeInquiryForm(form) {
     clearErrors();
     clearFeedback();
     showStep(0);
+    saveDraft();
   }));
+  get("inquiryChangeMode")?.addEventListener("click", () => {
+    if (busy) return;
+    compactMode = false;
+    clearErrors();
+    clearFeedback();
+    showStep(0);
+    saveDraft();
+    focusVisible(radios.find((radio) => radio.checked));
+  });
+  get("inquiryRemoveInspiration")?.addEventListener("click", () => {
+    if (busy) return;
+    clearFeedback();
+    get("inquiryInspiration").value = "";
+    errors.delete("inquiryInspiration");
+    renderErrors();
+    renderContext();
+    if (currentStep === 2) renderReview();
+    saveDraft();
+    focusVisible(get(`inquiryStepTitle${currentStep}`));
+  });
+  get("inquiryDiscardDraft")?.addEventListener("click", () => {
+    if (busy) return;
+    form.reset();
+    compactMode = false;
+    disclosures.forEach((details) => { delete details.dataset.interacted; });
+    adaptDisclosures();
+    clearDraft();
+    clearErrors();
+    clearFeedback();
+    updatePanels();
+    showStep(0, true);
+  });
   const updateAnswer = (event) => {
     if (busy || !inputs.includes(event.target)) return;
     rememberDisclosure(event.target);
@@ -325,6 +454,7 @@ function initializeInquiryForm(form) {
     }
     renderErrors();
     if (currentStep === 2) renderReview();
+    saveDraft();
   };
   form.addEventListener("input", updateAnswer);
   form.addEventListener("change", updateAnswer);
@@ -391,9 +521,12 @@ function initializeInquiryForm(form) {
     payload.set("subject", subject);
     payload.set("request_type", selectedType());
     payload.set("inquiry_summary", summary);
+    // A reload during delivery must not imply that it is safe to send again.
+    uncertainSubmission = true;
+    setBusy(true);
+    saveDraft();
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
-    setBusy(true);
     showStatus("Sending your inquiry…");
     try {
       const response = await fetch(endpoint, {
@@ -407,6 +540,7 @@ function initializeInquiryForm(form) {
         (!Array.isArray(result.errors) || result.errors.length > 0));
       const accepted = result?.ok !== false && (result?.ok === true || typeof result?.next === "string");
       if (response.ok && accepted && !hasErrors) {
+        clearDraft();
         form.reset();
         disclosures.forEach((details) => { delete details.dataset.interacted; });
         adaptDisclosures();
@@ -419,6 +553,8 @@ function initializeInquiryForm(form) {
         showPhotoFollowup(identity, subject);
         showStatus("Thank you—your inquiry has been submitted. Bryce will confirm availability, pricing, and next steps with you. Your order or wholesale account is not confirmed yet.", "success", true);
       } else {
+        uncertainSubmission = response.ok;
+        saveDraft();
         showEmailFallback(summary, subject);
         showRemoteErrors(result);
         const message = response.status === 429
@@ -433,6 +569,7 @@ function initializeInquiryForm(form) {
       }
     } catch {
       setBusy(false);
+      saveDraft();
       showEmailFallback(summary, subject);
       showStatus("We couldn’t confirm whether your inquiry went through. Please contact Bryce before sending it again to avoid a duplicate. Your details are still here, and you can copy them below.", "error", true);
     } finally {
@@ -447,6 +584,7 @@ function initializeInquiryForm(form) {
       if (busy) { event.preventDefault(); return; }
       const type = link.dataset.inquiryType;
       if (!["custom", "wholesale"].includes(type)) return;
+      compactMode = true;
       radios.forEach((radio) => { radio.checked = radio.value === type; });
       const orderType = get("orderType");
       if (type === "custom" && link.dataset.orderType &&
@@ -462,15 +600,18 @@ function initializeInquiryForm(form) {
       clearErrors();
       clearFeedback();
       showStep(0);
+      saveDraft();
       form.focus({ preventScroll: true });
     });
   });
 
   fields.disabled = false;
+  const restored = restoreDraft();
   updatePanels();
   updateMinimumDates();
-  showStep(0);
+  showStep(currentStep);
   adaptDisclosures();
+  if (restored) showDraftNotice(true);
   form.dataset.ready = "true";
   // With JavaScript ready, inquiry links land on the controls, including on phones.
   // Without JavaScript, the original section anchor still reaches the email fallback.
